@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.Ruserdata
+old/
+99_old/
+*.ini
+*.csv
+
