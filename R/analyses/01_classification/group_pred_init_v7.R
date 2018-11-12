@@ -24,8 +24,10 @@ agk.group.pred.init = function() {
   dat_match = dat_match_bcp_study_selected
   
   # plot ratings
-  setwd(root_wd)
-  source("01_classification/plot_ratings_betting_behav.R")
+  if (plot_ratings_done == F) {
+    setwd(root_wd)
+    source("01_classification/plot_ratings_betting_behav.R")
+  }
   
   # prep if peripheral physiology or ratings should be added
   if ((add_cr_pp  == 1 || add_cr_ra  == 1) & which_study != 'MRI') {
@@ -123,9 +125,7 @@ agk.group.pred.init = function() {
   CV_res = list()
   
   # cons
-  if (do_data_inv == 0) {
-    contrasts(data_pdt$cat) = contrasts(data_pdt$cat)
-  }
+  contrasts(data_pdt$cat) = contrasts(data_pdt$cat)
   
   # control variables
   if (length(pred_to_control) == 1) {

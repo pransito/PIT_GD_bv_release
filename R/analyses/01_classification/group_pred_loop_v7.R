@@ -263,28 +263,10 @@ if (noout_cv_noaddfeat) {
   agk.pred.group.CV(outer_CV = F,addfeat = F,add_cr_pp_fn = F,add_cr_ra_fn = F,des_seed)
 }
 
-# behavioral parameter sets plus additional features ==========================
-if (outer_cv_wiaddfeat | noout_cv_wiaddfeat) {stopifnot(add_cr_pp_ma | add_cr_ra_ma)}
-if (outer_cv_wiaddfeat) {
-  agk.pred.group.CV(outer_CV = T,addfeat = T,add_cr_pp_ma,add_cr_ra_ma,des_seed)
-}
-if (noout_cv_wiaddfeat) {
-  agk.pred.group.CV(outer_CV = F,addfeat = T,add_cr_pp_ma,add_cr_ra_ma,des_seed)
-}
-
-# only additional features ===================================================
-if (outer_cv_addfeaton | noout_cv_addfeaton) {stopifnot(add_cr_pp_ma | add_cr_ra_ma)}
-if (outer_cv_addfeaton) {
-  agk.pred.group.CV(outer_CV = T,addfeat = T,add_cr_pp_ma,add_cr_ra_ma,des_seed,addfeat_only = T)
-}
-if (noout_cv_addfeaton) {
-  agk.pred.group.CV(outer_CV = F,addfeat = T,add_cr_pp_ma,add_cr_ra_ma,des_seed,addfeat_only = T)
-}
-
 # OUTERCV, CONTROL MODEL =====================================================
 # the control model; intercept only, or only the control variables
 if (outer_cv_c_model) {
-  agk.pred.group.CV(outer_CV = T,addfeat=F,add_cr_pp_ma = F,add_cr_ra_ma = F,des_seed,addfeat_only = F,c_mod = T)
+  agk.pred.group.CV(outer_CV = T,addfeat=F,add_cr_pp_fn = F,add_cr_ra_fn = F,des_seed,addfeat_only = F,c_mod = T)
 }
 
 # REPORTING: PREPARATION =====================================================

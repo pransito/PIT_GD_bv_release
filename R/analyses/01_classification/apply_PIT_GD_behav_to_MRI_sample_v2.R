@@ -21,7 +21,7 @@ get.truth.2 = function() {
 }
 
 # set runs of random classification
-runs0 = 10000
+runs0 = 1000
 
 # under 0
 # pooled

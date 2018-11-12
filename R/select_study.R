@@ -21,31 +21,14 @@ data_pdt     = data_pdt_bcp
 data_pdt_inv = data_pdt
 
 ## PARAMETER SETTINGS =========================================================
-# which study to look at (Cohorts)? ===========================================
-#which_study = "MRI"
-#which_study = "MRI_and_POSTPILOT" # lumping those together (for KFG prediction e.g.)
+
+# which study to look at (Cohorts)?
+#which_study = "MRI" (the validation sample)
 which_study = "POSTPILOT_HCPG" # CAREFUL: had different set of neutral pictures (?!?!)
-#which_study = "TEST" # when K.Brehm used POSTPILOT and simulated facial expression (8888) or not (7777)
-#which_study = "Prestudy" # HC groups before core behav study; for image adequacy (PhysioPilot)
-#which_study = "sanity"
-#which_study = "POSTPILOT_HC" # this for testing image adequacy within HC of core behav study
-#which_study = "POSTPILOT_PG" # this for testing image adequacy within PG of core behav study
-#which_study = "MRI_HC" # this for testing image adequacy within HC of core behav study
-#which_study = "POSTPILOT_PGxGENDER" # this for testing the effect of gender in pg group
-#which_study = "MRI_LB" # subsample MA
 
-# default data_inv
-if (which_study == 'MRI') {
-  do_data_inv = 0 
-} else {
-  do_data_inv = 0
-}
+# plot the ratings
+plot_ratings_done = F
 
-# desired data_inv
-# use of cohort all subjects but that subject of the group to determine value
-# imageRating1s is craving
-do_data_inv      = 0
-data_pdt_inv_var = 'imageRating1s'
 
 ## PREPARATIONS ===============================================================
 if (physio_sum_fun == 'mean') {
@@ -130,59 +113,26 @@ if ((length(grep(which_study, pattern = "HC")) != 0) & (length(grep(which_study,
 }
 
 ## DATA_INV ===================================================================
-# prepare a data_pdt_inv df
-# this df uses all data EXCEPT the data in which_study
-if (do_data_inv == 1) {
-  all_subs          = unique(data_pdt$subject)
-  data_pdt$cat_orig = data_pdt$cat
-  data_pdt$cat      = NA
-  
-  for (ss in 1:length(all_subs)) {
-    # get everything but subject == cur_sub data
-    cur_dat = subset(data_pdt, subject != all_subs[ss])
-    
-    # select group
-    #cur_dat = subset(cur_dat, HCPG == first(data_pdt$HCPG[data_pdt$subject == all_subs[ss]]))
-    
-    # aggregate by stimulus
-    cur_dat = cur_dat[c('subject','stim',data_pdt_inv_var)]
-    cur_dat = cur_dat[-which(duplicated(cur_dat[c(1,2)])),]
-    cur_dat = aggregate(cur_dat[data_pdt_inv_var],by=list(cur_dat$subject,cur_dat$stim),FUN = mean)
-    cur_dat = aggregate(cur_dat[data_pdt_inv_var],by=list(cur_dat$Group.2),FUN=mean)
-    
-    # put it back
-    cur_compl_dat = subset(data_pdt, subject == all_subs[ss])
-    for (cc in 1:length(cur_compl_dat[,1])) {
-      cur_compl_dat$cat[cc] = cur_dat[which(cur_dat$Group.1 %in% cur_compl_dat$stim[cc]),data_pdt_inv_var]
-    }
-    data_pdt[data_pdt$subject == all_subs[ss],] = cur_compl_dat
-  }
-  data_pdt_inv = data_pdt
-} else {
-  data_pdt_inv = data_pdt
-}
-
-## END DATA_INV
+# prepare a data_pdt_inv df (legacy)
+data_pdt_inv = data_pdt
 
 # CATEGORY LABELS =============================================================
-if (do_data_inv == 0) {
-  # Main effect of the final experimental categories: gam, pos, neg, neu_aw
-  data_pdt_finCat = data_pdt
-  if (which_study == "Prestudy") {
-    data_pdt_finCat$cat = agk.recode.c(as.character(data_pdt_finCat$cat),c("1","2","3"),c("1","2","3"))
-    data_pdt_finCat$cat = factor(as.numeric(as.character(data_pdt_finCat$cat)),levels = c(1,2,3),
-                                 labels = c('gambling','negative', 'positive')) ## CAREFUL: I TOOK OUT ALL NEUTRAL PICTURES HERE!
-  } else if (which_study == "sanity") {
-    data_pdt_finCat$cat = factor(as.numeric(as.character(data_pdt_finCat$cat)),levels = c(6,2,3,7,8),
-                                 labels = c('neutral_IAPS','negative_VPPG', 'positive_VPPG','negative_IAPS','positive_IAPS'))
-  } else if (which_study == "POSTPILOT_PG" | which_study == "POSTPILOT_PGxGENDER" | 
-             which_study == "POSTPILOT_HC" | which_study == "MRI_HC" | 
-             which_study == "MRI_PG" | which_study == "POSTPILOT_HCPG" | 
-             which_study == "MRI" | which_study == "MRI_and_POSTPILOT" |
-             which_study == "TEST") {
-    data_pdt_finCat$cat = factor(as.numeric(as.character(data_pdt_finCat$cat)),levels = c(6,1,2,3),
-                                 labels = c('neutral','gambling','negative', 'positive'))
-  }
+# Main effect of the final experimental categories: gam, pos, neg, neu_aw
+data_pdt_finCat = data_pdt
+if (which_study == "Prestudy") {
+  data_pdt_finCat$cat = agk.recode.c(as.character(data_pdt_finCat$cat),c("1","2","3"),c("1","2","3"))
+  data_pdt_finCat$cat = factor(as.numeric(as.character(data_pdt_finCat$cat)),levels = c(1,2,3),
+                               labels = c('gambling','negative', 'positive')) ## CAREFUL: I TOOK OUT ALL NEUTRAL PICTURES HERE!
+} else if (which_study == "sanity") {
+  data_pdt_finCat$cat = factor(as.numeric(as.character(data_pdt_finCat$cat)),levels = c(6,2,3,7,8),
+                               labels = c('neutral_IAPS','negative_VPPG', 'positive_VPPG','negative_IAPS','positive_IAPS'))
+} else if (which_study == "POSTPILOT_PG" | which_study == "POSTPILOT_PGxGENDER" | 
+           which_study == "POSTPILOT_HC" | which_study == "MRI_HC" | 
+           which_study == "MRI_PG" | which_study == "POSTPILOT_HCPG" | 
+           which_study == "MRI" | which_study == "MRI_and_POSTPILOT" |
+           which_study == "TEST") {
+  data_pdt_finCat$cat = factor(as.numeric(as.character(data_pdt_finCat$cat)),levels = c(6,1,2,3),
+                               labels = c('neutral','gambling','negative', 'positive'))
 }
 
 if(sum(is.na(data_pdt$cat))) {
@@ -190,19 +140,15 @@ if(sum(is.na(data_pdt$cat))) {
 }
 
 ## VARIABLE TRANSFORMATIONS ===================================================
-if (do_data_inv == 0) {
-  data_pdt_finCat$valence_log       = get.log(data_pdt_finCat$valence)
-  data_pdt_finCat$imageRating2s_log = get.log.base(data_pdt_finCat$imageRating2s,10)
-  data_pdt_finCat$imageRating1s_log = get.log(data_pdt_finCat$imageRating1s)
-  data_pdt_finCat$imageRating4s_log = get.log(data_pdt_finCat$imageRating4s)
-  data_pdt_finCat$imageRating3s_log = get.log(data_pdt_finCat$imageRating3s)
-}
+data_pdt_finCat$valence_log       = get.log(data_pdt_finCat$valence)
+data_pdt_finCat$imageRating2s_log = get.log.base(data_pdt_finCat$imageRating2s,10)
+data_pdt_finCat$imageRating1s_log = get.log(data_pdt_finCat$imageRating1s)
+data_pdt_finCat$imageRating4s_log = get.log(data_pdt_finCat$imageRating4s)
+data_pdt_finCat$imageRating3s_log = get.log(data_pdt_finCat$imageRating3s)
 
 ## GET CAT LABELS AND TRANSFORMATIONS INTO DATA_PDT ===========================
 # DO THIS BFORE STARTING ANY ANALYSIS OF BEHAVIORAL PDT TASK DATA
-if (do_data_inv == 0) {
-  data_pdt         = data_pdt_finCat
-}
+data_pdt         = data_pdt_finCat
 data_pdt$subject = droplevels(data_pdt$subject)
 
 ## UNIT TEST GROUP VAR ========================================================
@@ -307,5 +253,6 @@ setwd('..')
 setwd('analyses/01_classification/')
 init_run = T
 source('group_pred_loop_v7.R')
-init_run     = F
-init_done    = T
+init_run          = F
+init_done         = T
+plot_ratings_done = T 
