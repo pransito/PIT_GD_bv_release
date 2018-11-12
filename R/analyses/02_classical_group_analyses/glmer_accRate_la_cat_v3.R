@@ -24,7 +24,7 @@ doBootPerm = 0
 doBoot     = 0
 # wd for saving the results of the bootstraps
 setwd(root_wd)
-setwd('02_univariate_testing/results/effects_under_0_la')
+setwd('02_classical_group_analyses/results/effects_under_0_la')
 if (which_study == 'MRT') {
   cd('MRI')
 } else if (which_study == 'POSTPILOT_HCPG') {

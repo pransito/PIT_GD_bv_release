@@ -1,4 +1,4 @@
-# analysis of ratings (comparison of cue categires and groups)
+# analysis of ratings (comparison of cue categories and groups, respectively)
 # run select_study.R with which_study == 'POSTPILOT_HCPG' first
 # the function agk.summarize.models will do a one-group analysis and compare
 # all categories and it will do a group comparison (HC vs. GD)
@@ -9,6 +9,7 @@ agk.load.ifnot.install('lme4')
 agk.load.ifnot.install('multcomp')
 agk.load.ifnot.install('nloptr')
 agk.load.ifnot.install('pracma')
+stopifnot(which_study == 'POSTPILOT_HCPG')
 
 ## PUT DATA_PDT in safe-keeping ===============================================
 data_pdt_ra_bcp = data_pdt
@@ -127,18 +128,6 @@ if (any(c('HC','PG') %in% which_group)) {
 } else {
   stop('Do not no this value of which_group.')
 }
-
-
-# debug
-#data_pdt = subset(data_pdt, Cohort == 'PhysioPilot')
-#data_pdt = data_pdt[grep(pattern = '^5',x = data_pdt$stim),]
-
-# CATEGORY LABELS =============================================================
-# Main effect of the final experimental categories: gam, pos, neg, neu_aw
-# data_pdt_finCat = data_pdt
-# data_pdt_finCat$cat = factor(as.numeric(as.character(data_pdt_finCat$cat)),levels = c(1,2,3,4,5,6,7,8),
-#                              labels = c('gam','neg', 'pos','neuIAPS_NAPS','gray','neuIAPSAW','negIAPS','posIAPS'))
-# data_pdt = data_pdt_finCat
 
 if(sum(is.na(data_pdt$cat))) {
   stop('There are NAs in the data_pdt$cat variable!')

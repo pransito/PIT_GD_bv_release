@@ -1,11 +1,9 @@
 # explorative correlations
 # LA, PIT variables and BDI, BIS, AUDIT, KFG, GBQ, edu, ftnd
 
-# run import_data
-# run select_study (which_study = "MRT_and_POSTPILOT")
-# run group_pred_init_v6.R with everything under "what to run" set to 0
+# run select_study (which_study = "MRI_and_POSTPILOT")
 
-# prepping
+# preparing
 row.names(dat_match)  = dat_match$VPPG
 pit_vars              = fm$ac
 pit_vars              = agk.clean.intercept.name(pit_vars)
@@ -14,6 +12,7 @@ pit_vars$ac_Intercept = NULL
 la_vars               = fm$laCh_LA
 la_vars               = la_vars[c('gain','loss','LA')]
 names(la_vars)        = paste0('laCh_',names(la_vars))
+stopifnot(which_study == "MRI_and_POSTPILOT")
 
 
 # merging
@@ -37,12 +36,14 @@ r_sp_p = r_sp$p
 
 # plot function if sig
 agk.plot.cor.if.sig = function(r_ps_p,r_sp_p,behav_params, constr_params) {
+  ct = 0
   stopifnot(all(dim(r_ps_p) == dim(r_sp_p)))
   for (ii in 1:length(r_ps_p[,1])) {
     for (jj in 1:length(r_ps_p[1,])) {
       cur_p_ps = r_ps_p[ii,jj]
       cur_p_sp = r_sp_p[ii,jj]
       if (cur_p_sp < 0.05 & cur_p_ps < 0.05) {
+        ct = ct + 1
         plot(behav_params[[ii]],constr_params[[jj]],
              ylab=names(constr_params)[jj],
              xlab=names(behav_params)[ii],
@@ -50,6 +51,7 @@ agk.plot.cor.if.sig = function(r_ps_p,r_sp_p,behav_params, constr_params) {
       }
     }
   }
+  if(ct == 0) {message('No significant correlation found.')}
 }
 
 agk.plot.cor.if.sig(r_sp$p,r_ps$p,behav_params,constr_params)
