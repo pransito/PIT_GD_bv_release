@@ -1,5 +1,5 @@
-R_PDT
------
+R Code for the PIT Gambling Disorder paper (behavioral data)
+-----------------------------------------------------------
 
 Code for publication of "Cue-induced effects on decision-making distinguish gambling disorder subjects from healthy controls"
 by: Alexander Genauck (2018)
