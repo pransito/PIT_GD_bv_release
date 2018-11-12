@@ -8,19 +8,19 @@
 
 ## WHAT TO RUN ================================================================
 # just the behavioral parameter sets
-outer_cv_noaddfeat      = 0 # with outer CV, getting generalization error, Ha
-noout_cv_noaddfeat      = 0 # no outer CV, get complete model on whole sample
+outer_cv_noaddfeat      = T # with outer CV, getting generalization error, Ha
+noout_cv_noaddfeat      = T # no outer CV, get complete model on whole sample
 
 # control model
-outer_cv_c_model        = 0 # control model/null-model for classification; predict with covariate
+outer_cv_c_model        = T # control model/null-model for classification; predict with covariate
 
 # what to report
-do_report               = 1
-do_report_no_added_feat = 1
+do_report               = F
+do_report_no_added_feat = F
 
 # how many runs?
 # set to 1010: behav predictions (PIT GD behav paper, for reporting) 
-runs                    = 1010
+runs                    = 10
 
 # advanced settings for other studies =========================================
 # [cannot be used in PIT GD behav release] 
