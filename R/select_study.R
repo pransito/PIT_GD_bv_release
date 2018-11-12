@@ -27,11 +27,11 @@ which_study = "POSTPILOT_HCPG" # the main sample used for training/crossvalidati
 #which_study = "MRI" (the validation sample)
 #which_study = "MRI_and_POSTPILOT" # lumping together the samples for exploratory correlations
 
+
+## PREPARATIONS (from here onwards , do not change anything ===================
 # plot the ratings
 plot_ratings_done = F
 
-
-## PREPARATIONS ===============================================================
 if (physio_sum_fun == 'mean') {
   data_pdt$corr = data_pdt$corr_auc
   data_pdt$eda  = data_pdt$eda_auc
@@ -51,16 +51,7 @@ if (physio_sum_fun == 'mean') {
   stop('No proper physio_sum_fun provided.')
 }
 
-# ## rt cut off (are we still using this? should not be in here!)
-# # must go, if so, to data cleaning
-# if(which_study == "MRI" | which_study == "MRI_HC"| which_study == "MRI_LB") {
-#   rt_cut_off = 0.15
-# } else {
-#   rt_cut_off = 1.0
-# }
-
 ## FUNCTIONS ==================================================================
-# why is this here?!?!?
 cur_summary_function = function(x) median(x, na.rm=TRUE)
 # needs the f.difftest function from the import_data file
 f = function(x) {
