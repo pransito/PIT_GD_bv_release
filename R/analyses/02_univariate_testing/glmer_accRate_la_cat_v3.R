@@ -103,29 +103,29 @@ mod_accnc        = aggregate(mod_accnc$mean_acceptance,by=list(mod_accnc$Group),
 mod_accnc        = data.frame(mod_accnc[[1]],mod_accnc[[2]])
 names(mod_accnc) = c('Group','mean_acceptance','ci_0025','ci_0975')
 mod_accnc$Group  = agk.recode.c(mod_accnc$Group,'PG','GD')
+print(mod_accnc)
 
 # stats
-anova(moda_00,moda_01,moda_02)
+print(anova(moda_00,moda_01,moda_02))
 
 # stats without cat (simple acceptance rate difference between groups)
-anova(moda_00,moda_01b)
+print(anova(moda_00,moda_01b))
 
 ## loss aversion (la) overall and group comparison ============================
 # stats glmer
-anova(modla_00,modla_01,modla_0g,modla_cg,modla_cgi) # all models
-anova(modla_00,modla_01,modla_0g)                    # only loss aversion relevant
+print(anova(modla_00,modla_01,modla_0g,modla_cg,modla_cgi)) # all models
+print(anova(modla_00,modla_01,modla_0g))                    # only loss aversion relevant
 
 ## plot loss aversion between groups ==========================================
 # bootstrap the CIs
 setwd(bootResWd)
 if (doBoot == 1) {
-  # bootstrap p-value modla_0g (permutation)
-  effects_under_0_0g = agk.boot.p.mermod(mermod = modla_0g,mermod0 = modla_01,num_cpus = cur_cpus,num = cur_num,fun_extract = fixef,cur_control = cur_control,permvars = c('HCPG'),type='perm')
-  save(file= 'effects_under_0_0g_perm_1000.RData',list=c('effects_under_0_0g'))
-  
   # bootstrap cfint modla_0g (np boot)
-  boot_cfint_0g = agk.boot.cfint.mermod(mermod = modla_0g,num_cpus = cur_cpus,num = cur_num,fun_extract = fixef,cur_control = cur_control,type = 'non-parametric')
-  save(file = 'boot_cfint_0g_1000.RData',list=c('boot_cfint_0g'))
+  boot_cfint_0g = agk.boot.cfint.mermod(mermod = modla_0g,num_cpus = cur_cpus,
+                                        num = cur_num,fun_extract = fixef,
+                                        cur_control = cur_control,
+                                        type = 'non-parametric')
+  save(file = 'boot_cfint_0g_1000_wc.RData',list=c('boot_cfint_0g'))
 }
 
 # graph fixed effects la model
