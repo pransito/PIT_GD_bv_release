@@ -24,7 +24,7 @@ data_pdt_inv = data_pdt
 
 # which study to look at (Cohorts)?
 which_study = "POSTPILOT_HCPG" # the main sample used for training/crossvalidation
-#which_study = "MRI" (the validation sample)
+#which_study = "MRI" # (the validation sample)
 #which_study = "MRI_and_POSTPILOT" # lumping together the samples for exploratory correlations
 
 

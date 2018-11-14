@@ -21,7 +21,7 @@ get.truth.2 = function() {
 }
 
 # set runs of random classification
-runs0 = 1000
+runs0 = 10000
 
 # under 0
 # pooled
@@ -62,7 +62,17 @@ for (ii in 1:runs0) {
 ## use a consensus of ALL models from PDT behav ===============================
 setwd(root_wd)
 setwd('01_classification/results/1010/')
-load('POSTPILOT_HCPG_predGrp1_rounds_noo_noaddfeat.RData')
+e = new.env()
+load('POSTPILOT_HCPG_predGrp1_rounds_noo_noaddfeat.RData',e)
+shorten = function(x) {
+  if (length(x) > 1000) {
+    return(x[1:1000])
+  } else {
+    return(x)
+  }
+}
+e = as.environment(lapply(e,FUN=shorten))
+agk.assign.envtoenv(e,globalenv())
 
 # get the standardization
 # THIS CODE JUST FOR DOCUMENTATION; HAS BEEN DONE BEFORE AND RESULT SAVED
