@@ -31,10 +31,7 @@ The classical group analysis part using hierarchical regression (lme4) is  with 
 Making the ratings graph. It is automatically produced when running "group_pred_loop_v7.R". 
 
 6)
-Ratings: statistical tests. Run the script "R/analyses/03_image_adequacy/ratings_analysis_for_paper.R". Check the instructions at the top of the script. 
-
-7)
-Explorative correlations between loss aversion/PIT parameters and questionnaire data, is  with the script: "/02_classical_group_analyses/correlations_PIT_LA_questionnaires.R" Check the instructions at the top of the script.
+Ratings: statistical tests. Run the script "R/analyses/03_image_adequacy/ratings_analysis_for_paper.R". Check the instructions at the top of the script.
 
 
 Enjoy! Any questions, or bugs please send by raising an issue in this GitHub repository.
