@@ -115,10 +115,12 @@ all_alphas            = F
 # message box width
 box_width             = 800
 # what predictors to control for
-if (which_study == 'MRT') {
+if (which_study == 'MRI') {
   pred_to_control = c()
-} else {
+} else if (which_study == 'POSTPILOT_HCPG'){
   pred_to_control = c('smoking_ftdt')
+} else {
+  stop ('Unknown value of "which_study".')
 }
 # how many times should full model fit repeated with different folds to get
 # mean model? glmnet or svm
@@ -130,7 +132,7 @@ regress_out_covs      = 0
 # regress out covs (cleaning MRI data) information criterion
 clean_inf_crit        = 'AIC'
 # what predictors to clean for
-if (which_study == 'MRT') {
+if (which_study == 'MRI') {
   pred_to_clean = c('edu_years')
 } else {
   pred_to_clean = c('smoking_ftdt')
@@ -220,7 +222,7 @@ c_mod_report = T
 add_cr_pp   = add_cr_pp_ma
 add_cr_ra   = add_cr_ra_ma
 
-if (which_study == 'MRT_and_POSTPILOT') {
+if (which_study == 'MRI_and_POSTPILOT') {
   add_cr_pp   = 0
   add_cr_ra   = 0
 }
@@ -676,7 +678,7 @@ if (do_report_no_added_feat | do_report_with_added_feat | do_report_feat_only) {
                               c("gambling cues","negative cues","positive cues","intercept behavioral model","intercept of classifier","smoking severity"))
   ci_res$coef    = factor(ci_res$coef, levels = levels(ci_res$coef), labels = labels_betas)
   
-  if (which_study == 'MRT') {
+  if (which_study == 'MRI') {
     # names simpler:
     ci_res$coef = gsub('SS__grp01_noCov_','',ci_res$coef)
     ci_res$coef = gsub('SS__','',ci_res$coef)
@@ -699,7 +701,7 @@ if (do_report_no_added_feat | do_report_with_added_feat | do_report_feat_only) {
   p = p + xlab("regression weights")
   print(p)
   
-  if (which_study == 'MRT') {
+  if (which_study == 'MRI') {
     # giving a grouped overview
     grouping                                                  = rep(NA,length(ci_res$coef))
     grouping[grep('^Pic',ci_res$coef)]                        = 'cue_reactivity'
