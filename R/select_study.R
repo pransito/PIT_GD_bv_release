@@ -230,7 +230,7 @@ if (which_study == 'MRI') {
   report_CV_p = T
 } else {
   # Any reporting of p-values against null? Set to F if you do that in a separate script.
-  report_CV_p = F
+  report_CV_p = T
 }
 
 # no other features, only behavior
