@@ -24,98 +24,8 @@ agk.group.pred.init = function() {
   dat_match = dat_match_bcp_study_selected
   
   # plot ratings
-  if (plot_ratings_done == F) {
-    setwd(root_wd)
-    source("01_classification/plot_ratings_betting_behav.R")
-  }
-  
-  # prep if peripheral physiology or ratings should be added
-  if ((add_cr_pp  == 1 || add_cr_ra  == 1) & which_study != 'MRI') {
-    # excluding subjects because of missing in pp or ra
-    # prepping data frames for ra and pp
-    cur_path = getwd()
-    setwd(root_wd)
-    source("01_classification/get_phys_and_rating_params_and_plots_v2.R")
-  } else if (add_cr_pp  == 1 & which_study == 'MRI') {
-    # data is already gathered and in workspace
-  } else {
-    # do nothing
-  }
-  
-  if (which_study == 'MRI' & add_cr_pp_ma) {
-    #cr_agg_pp = cr_agg_pp_readin
-    cr_agg_pp = cr_agg_pp_r_MRI
-    # clean out subject variable
-    row.names(cr_agg_pp) = cr_agg_pp$subject
-    cr_agg_pp$subject    = NULL
-    
-    # standardize within subject
-    cr_agg_pp = as.data.frame(t(scale(t(cr_agg_pp))))
-    
-    # reduce set further by computing means
-    cr_agg_pp_m = cr_agg_pp
-    # SS cue reactivity variables; mean of L and R (so mean of two variables)
-    all_cr_names   = names(cr_agg_pp_m)[grep('SS__grp01_',names(cr_agg_pp_m))]
-    all_cr_names_L = all_cr_names[grep('_Left_',all_cr_names)]
-    for (nn in 1:length(all_cr_names_L)) {
-      cur_name                     = all_cr_names_L[nn]
-      cur_R                        = gsub('_Left_','_Right_',cur_name)
-      cr_agg_pp_m[[cur_name]]      = (cr_agg_pp_m[[cur_name]] + cr_agg_pp_m[[cur_R]]) /2
-      cr_agg_pp_m[cur_R]           = NULL
-      # get the name we need to change
-      cur_ind                     = which(names(cr_agg_pp_m) == cur_name)
-      names(cr_agg_pp_m)[cur_ind] = gsub('_Left_','_LR_',names(cr_agg_pp_m[cur_name]))
-    }
-    # SS gPPI PIT variables; mean of L and R (so mean of four variables)
-    all_gppi_names         = names(cr_agg_pp_m)[grep('SS__PPI_',names(cr_agg_pp_m))]
-    all_gppi_names_L       = all_gppi_names[grep('_PPI_L',all_gppi_names)]
-    all_gppi_names_L_L_tar = all_gppi_names[grep('_ROI_L',all_gppi_names_L)]
-    for (nn in 1:length(all_gppi_names_L_L_tar)) {
-      cur_name                     = all_gppi_names_L_L_tar[nn]             # left source left target
-      cur_R_source                 = gsub('_PPI_L_','_PPI_R_',cur_name)     # right source left target
-      cur_R_source_L_tar           = gsub('_ROI_L_','_ROI_R_',cur_R_source) # right source right target
-      cur_L_source_L_tar           = gsub('_ROI_L_','_ROI_R_',cur_name)     # left source right target
-      
-      # new name and calculation of mean
-      new_name                     = gsub('_PPI_L_','_PPI_LR_',cur_name)
-      new_name                     = gsub('_ROI_L_','_ROI_LR_',new_name)
-      cr_agg_pp_m[[new_name]]      = (cr_agg_pp_m[[cur_name]] + cr_agg_pp_m[[cur_R_source]] + cr_agg_pp_m[[cur_R_source_L_tar]] + cr_agg_pp_m[[cur_L_source_L_tar]])/4
-      
-      # delete unneeded variables
-      cr_agg_pp_m[cur_name]            = NULL
-      cr_agg_pp_m[cur_R_source]        = NULL
-      cr_agg_pp_m[cur_R_source_L_tar]  = NULL
-      cr_agg_pp_m[cur_L_source_L_tar]  = NULL
-    }
-    # some by hand
-    if (fmri_extr == 'ngm' | fmri_extr == 'glc') {
-      cr_agg_pp_m$SS__PPI_LR_Amy_noCov_PPI_PicGamOnxaccXgam_ROI_R_MOrG = (cr_agg_pp_m$SS__PPI_L_Amy_noCov_PPI_PicGamOnxaccXgam_ROI_R_MOrG + cr_agg_pp_m$SS__PPI_R_Amy_noCov_PPI_PicGamOnxaccXgam_ROI_R_MOrG)/2
-      cr_agg_pp_m$SS__PPI_LR_Amy_noCov_PPI_PicGamOnxaccXneg_ROI_R_MOrG = (cr_agg_pp_m$SS__PPI_L_Amy_noCov_PPI_PicGamOnxaccXneg_ROI_R_MOrG + cr_agg_pp_m$SS__PPI_R_Amy_noCov_PPI_PicGamOnxaccXneg_ROI_R_MOrG)/2
-      cr_agg_pp_m$SS__PPI_LR_Amy_noCov_PPI_PicGamOnxaccXpos_ROI_R_MOrG  = (cr_agg_pp_m$SS__PPI_L_Amy_noCov_PPI_PicGamOnxaccXpos_ROI_R_MOrG + cr_agg_pp_m$SS__PPI_R_Amy_noCov_PPI_PicGamOnxaccXpos_ROI_R_MOrG)/2
-    } else if (fmri_extr == 'val') {
-      cr_agg_pp_m$SS__PPI_LR_Amy_noCov_PPI_PicGamOnxvalXgam_ROI_R_MOrG = (cr_agg_pp_m$SS__PPI_L_Amy_noCov_PPI_PicGamOnxvalXgam_ROI_R_MOrG + cr_agg_pp_m$SS__PPI_R_Amy_noCov_PPI_PicGamOnxvalXgam_ROI_R_MOrG)/2
-      cr_agg_pp_m$SS__PPI_LR_Amy_noCov_PPI_PicGamOnxvalXneg_ROI_R_MOrG = (cr_agg_pp_m$SS__PPI_L_Amy_noCov_PPI_PicGamOnxvalXneg_ROI_R_MOrG + cr_agg_pp_m$SS__PPI_R_Amy_noCov_PPI_PicGamOnxvalXneg_ROI_R_MOrG)/2
-      cr_agg_pp_m$SS__PPI_LR_Amy_noCov_PPI_PicGamOnxvalXpos_ROI_R_MOrG  = (cr_agg_pp_m$SS__PPI_L_Amy_noCov_PPI_PicGamOnxvalXpos_ROI_R_MOrG + cr_agg_pp_m$SS__PPI_R_Amy_noCov_PPI_PicGamOnxvalXpos_ROI_R_MOrG)/2
-    }
-    
-    # delete unneeded variables
-    cr_agg_pp_m[names(cr_agg_pp_m)[grep('PPI_._',names(cr_agg_pp_m))]] = NULL
-    cr_agg_pp = cr_agg_pp_m
-  }
-  
-  # cleaning cr_agg_pp
-  if (add_cr_pp_ma & which_study == 'MRI') {
-    if (regress_out_covs) {
-      if (!exists('cr_agg_pp_cleaned')) {
-        vars_to_cov       = pred_to_clean
-        res               = agk.clean.vars(cr_agg_pp,dat_match,vars_to_cov,clean_inf_crit)
-        cr_agg_pp_cleaned = res$cr_agg_pp_cleaned
-        cr_agg_pp         = res$cr_agg_pp
-      } else {
-        cr_agg_pp = cr_agg_pp_cleaned
-      }
-    }
-  }
+  setwd(root_wd)
+  source("01_classification/plot_ratings_betting_behav.R")
   
   # set deviance measure
   cur_family = "binomial"
@@ -284,59 +194,6 @@ agk.group.pred.init = function() {
   # backup the fm
   fm_bcp = fm
   
-  ## RIDGE THE EXP BEHAV MODELS =================================================
-  if (ridge_behav_models == T) {
-    if (ridge_behav_models_anew == T) {
-      # warning
-      message('update glmnet to perhaps avoid having to provide fixed lambdas directly')
-      # what alphas to use?
-      cur_alpha = ridge_bm_alphas
-      
-      disp('Ridging the extracted exp. parameters for all models within every subject')
-      # body of function to parallelize
-      cur.mod.ridging = function(kk) {
-        # decide whether this model is ridgeable
-        cur_coefs = coef(fm[[kk]])
-        if (!isempty(grep('Intercept',names(cur_coefs)))) {min_length = 3} else {min_length = 2} 
-        if (length(names(cur_coefs)) < min_length) {
-          fm[[kk]] = coef(fm[[kk]])
-          next
-        }
-        
-        disp(paste('Ridging model...',names(fm)[kk]))
-        cur_mod    = lapply(fm[[kk]],FUN=agk.glmnet.lm.cvalpha,fam_arg='binomial',
-                            type_measure='auc',lambda=des_lambdas,nfolds=5,
-                            alphas = cur_alpha,verbosity = 1)
-        coef_listr = cur_mod[[1]]$coef
-        
-        for (ii in 2:length(cur_mod)) {
-          coef_listr = rbind(coef_listr,cur_mod[[ii]]$coef)
-        }
-        row.names(coef_listr) = NULL
-        coef_listr = data.frame(coef_listr)
-        colnames(coef_listr) = names(coef(fm[[kk]]))
-        
-        # packing back
-        return(coef_listr)
-      }
-      
-      total = length(fm)
-      cl    = parallel::makeCluster((detectCores()-1))
-      registerDoSNOW(cl)
-      fm_ridge = foreach(kk=1:total, .packages=c('glmnetUtils','cvTools'),.verbose=T,.export = c()) %dopar% {
-        cur.mod.ridging(kk)
-      } 
-      stopCluster(cl)
-      
-      # packing back, saving
-      fm = fm_ridge
-      save(file = 'ridged_behav_models.RData', list = c('fm'))
-    } else {
-      disp('loading the ridged behav params')
-      load('ridged_behav_models.RData')
-    }
-  }
-  
   # getting all the subs
   all_subs = names(fm[[1]])
   
@@ -397,15 +254,6 @@ agk.group.pred.init = function() {
       if (length(fm[[ff]]) >= 2) {
         fm[[ff]] = as.data.frame(t(scale(t(fm[[ff]]))))
       }
-    }
-  }
-  
-  # Regress out covariates
-  if (regress_out_covs) {
-    for (ff in 1:length(fm)) {
-      vars_to_cov       = pred_to_clean
-      res               = agk.clean.vars(fm[[ff]],dat_match,vars_to_cov,clean_inf_crit)
-      fm[[ff]]          = res$cr_agg_pp
     }
   }
   
@@ -471,44 +319,11 @@ agk.group.pred.init = function() {
     disp('Not scaling additional features overall.')
   }
   
-  if (add_cr_pp  == 1 || add_cr_ra  == 1) {
-    # ADDING OTHER FEATURES (E.G. PHYSIO)
-    # getting the rat and phys feature cluster
-    tmp         = tmp_exp
-    exp_params  = names(tmp)
-    tmp_rat     = agk.merge.df.by.row.names(tmp,cr_agg_ra)
-    tmp_rat     = tmp_rat[!names(tmp_rat) %in% exp_params]
-    rat_params  = names(tmp_rat)
-    rat_params  = rat_params[!rat_params %in% c('subject')]
-    tmp_rat$subject = NULL
-    tmp_phys    = agk.merge.df.by.row.names(tmp_rat,cr_agg_pp)
-    tmp_phys    = tmp_phys[!names(tmp_phys) %in% rat_params]
-    tmp_phys$subject    = NULL
-    
-    # scaling (not done in with outer CV)
-    if (initial_scale) {
-      tmp_rat             = as.data.frame(scale(tmp_rat))
-      tmp_phys            = as.data.frame(scale(tmp_phys))
-    }
-    
-    # make sure that only used subjects are in additional pp
-    tmp_phys = subset(tmp_phys, row.names(tmp_phys) %in% unique(data_pdt$subject))
-    tmp_rat  = subset(tmp_rat, row.names(tmp_rat) %in% unique(data_pdt$subject))
-  }
-  
   # packing selected model coefs plus other feature clusters
   feature_clusters      = list()
   feature_clusters[[1]] = NULL
   ct                    = 2
-  if (add_cr_ra) {
-    feature_clusters[[ct]] = tmp_rat
-    ct                     = ct + 1
-  }
-  if (add_cr_pp) {
-    feature_clusters[[ct]] = tmp_phys
-    ct                     = ct + 1
-  }
-  
+
   # prep the coef table
   for (ii in 1:length(feature_clusters)) {
     if (ii > 1) {

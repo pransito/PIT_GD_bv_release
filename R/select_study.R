@@ -9,29 +9,32 @@ FOREIGN_RUN = T
 
 # PREPARATION FOR FOREIGN RUN =================================================
 if (FOREIGN_RUN) {
-  # root_wd needs to be the folder which holds the "PIT_GD_behav/R/analyses/"
+  # find our the roo directory
   rm(list=ls())
   root_wd  = paste0(dirname(rstudioapi::getSourceEditorContext()$path),'/analyses/')
   setwd(root_wd)
   load('.RData')
 }
 
+# get the paths
+res      = agk.get.working.location()
+base_gd  = res$base_gd
+path_ghb = res$path_ghb
+
+# foreign run
+path_res_classif = file.path(root_wd,'01_classification')
+
 # get the original data_pdt from data_import.R
 data_pdt     = data_pdt_bcp
 data_pdt_inv = data_pdt
 
 ## PARAMETER SETTINGS =========================================================
+# which study to look at (Cohorts)? ===========================================
+which_study = "POSTPILOT_HCPG"
+#which_study = "MRI"
+#which_study = "MRI_and_POSTPILOT" # lumping groups together
 
-# which study to look at (Cohorts)?
-which_study = "POSTPILOT_HCPG" # the main sample used for training/crossvalidation
-#which_study = "MRI" # (the validation sample)
-#which_study = "MRI_and_POSTPILOT" # lumping together the samples for exploratory correlations
-
-
-## PREPARATIONS (from here onwards , do not change anything ===================
-# plot the ratings
-plot_ratings_done = F
-
+## PREPARATIONS ===============================================================
 if (physio_sum_fun == 'mean') {
   data_pdt$corr = data_pdt$corr_auc
   data_pdt$eda  = data_pdt$eda_auc
@@ -52,6 +55,7 @@ if (physio_sum_fun == 'mean') {
 }
 
 ## FUNCTIONS ==================================================================
+# summary function
 cur_summary_function = function(x) median(x, na.rm=TRUE)
 # needs the f.difftest function from the import_data file
 f = function(x) {
@@ -104,10 +108,6 @@ if ((length(grep(which_study, pattern = "HC")) != 0) & (length(grep(which_study,
   data_pdt = subset(data_pdt,HCPG == "PG")
 }
 
-## DATA_INV ===================================================================
-# prepare a data_pdt_inv df (legacy)
-data_pdt_inv = data_pdt
-
 # CATEGORY LABELS =============================================================
 # Main effect of the final experimental categories: gam, pos, neg, neu_aw
 data_pdt_finCat = data_pdt
@@ -131,12 +131,20 @@ if(sum(is.na(data_pdt$cat))) {
   stop('There are NAs in the data_pdt$cat variable!')
 }
 
+## functions ==================================================================
+getmode <- function(v) {
+  # mode function
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
 ## VARIABLE TRANSFORMATIONS ===================================================
 data_pdt_finCat$valence_log       = get.log(data_pdt_finCat$valence)
 data_pdt_finCat$imageRating2s_log = get.log.base(data_pdt_finCat$imageRating2s,10)
 data_pdt_finCat$imageRating1s_log = get.log(data_pdt_finCat$imageRating1s)
 data_pdt_finCat$imageRating4s_log = get.log(data_pdt_finCat$imageRating4s)
 data_pdt_finCat$imageRating3s_log = get.log(data_pdt_finCat$imageRating3s)
+
 
 ## GET CAT LABELS AND TRANSFORMATIONS INTO DATA_PDT ===========================
 # DO THIS BFORE STARTING ANY ANALYSIS OF BEHAVIORAL PDT TASK DATA
@@ -162,8 +170,15 @@ if (which_study == "POSTPILOT_HCPG" | which_study == "POSTPILOT_HC" |
 # or better yet, align
 dat_match = dat_match[dat_match$VPPG %in% data_pdt$subject,]
 
-## ADD CATEGORY VARIABLES FOR laCh ============================================
+## REPORTING ON MISSINGS AND THEN DROPPING ALL MISSINGS =======================
+missing_trials = xtabs(is.na(data_pdt$accept_reject) ~ data_pdt$subject + data_pdt$HCPG)
+missing_trials = melt(missing_trials)
+names(missing_trials) = c('subject','HCPG','num_missing')
+print(summary(lm(num_missing ~ HCPG,missing_trials)))
+
 data_pdt = data_pdt[!is.na(data_pdt$accept_reject),]
+
+## ADD CATEGORY VARIABLES FOR laCh ============================================
 all_subs = unique(data_pdt$subject)
 enh_dpdt = list()
 
@@ -225,17 +240,12 @@ do_report_no_added_feat   = 0
 do_report_with_added_feat = 0
 do_report_feat_only       = 0
 
-if (which_study == 'MRI') {
-  # Any reporting of p-values against null? Set to F if you do that in a separate script.
-  report_CV_p = T
-} else {
-  # Any reporting of p-values against null? Set to F if you do that in a separate script.
-  report_CV_p = F
-}
+# Any reporting of p-values against null? Set to F if you do that in a separate script.
+report_CV_p = T
 
-# no other features, only behavior
-# master add cue reactivity: peripheral physiology or MRI
-add_cr_pp_ma         = F
+# we never deal with physio or fmri data
+add_cr_pp_ma = F
+
 # master add cue reactivity: ratings
 # should never be done, cause ratings are post-experiment
 add_cr_ra_ma         = F
@@ -245,6 +255,5 @@ setwd('..')
 setwd('analyses/01_classification/')
 init_run = T
 source('group_pred_loop_v7.R')
-init_run          = F
-init_done         = T
-plot_ratings_done = T 
+init_run     = F
+init_done    = T

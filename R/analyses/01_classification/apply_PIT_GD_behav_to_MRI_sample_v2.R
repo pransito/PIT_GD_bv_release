@@ -20,6 +20,10 @@ get.truth.2 = function() {
   sample(c(rep('HC',2),rep('PG',2)))
 }
 
+get.truth.1 = function() {
+  sample(c('HC','PG'),size = 1)
+}
+
 # set runs of random classification
 runs0 = 10000
 
@@ -35,13 +39,23 @@ for (ii in 1:runs0) {
   print(ii)
   inner_truths = c()
   inner_resps  = c()
-  # 3
+  # get 30 in each group
   for (jj in 1:10) {
     # get truth
     inner_truths = c(inner_truths,as.character(get.truth()))
     # get response
     inner_resps  = c(inner_resps,as.numeric(randn(1,6)*10))
   }
+  
+  # # add 4
+  # inner_truths = c(inner_truths,as.character(get.truth.2()))
+  # # get response
+  # inner_resps  = c(inner_resps,as.numeric(randn(1,4)*10))
+  # 
+  # # add 1
+  # inner_truths = c(inner_truths,as.character(get.truth.1()))
+  # # get response
+  # inner_resps  = c(inner_resps,as.numeric(randn(1,1)*10))
   
   # cur_auc
   cur_roc         = roc(inner_truths,inner_resps)
@@ -60,24 +74,15 @@ for (ii in 1:runs0) {
 }
 
 ## use a consensus of ALL models from PDT behav ===============================
-setwd(root_wd)
-setwd('01_classification/results/1010/')
-e = new.env()
-load('POSTPILOT_HCPG_predGrp1_rounds_noo_noaddfeat.RData',e)
-shorten = function(x) {
-  if (length(x) > 1000) {
-    return(x[1:1000])
-  } else {
-    return(x)
-  }
-}
-e = as.environment(lapply(e,FUN=shorten))
-agk.assign.envtoenv(e,globalenv())
+setwd(path_res_classif)
+setwd('results/1008/')
+load('POSTPILOT_HCPG_predGrp1_rounds_noo_noaddfeat.RData')
 
-# get the standardization
-# THIS CODE JUST FOR DOCUMENTATION; HAS BEEN DONE BEFORE AND RESULT SAVED
+# #get the standardization
+# #THIS CODE JUST FOR DOCUMENTATION; HAS BEEN DONE BEFORE AND RESULT SAVED
 # # first load postpilot data [prep for publication a new workspace]
-# setwd('C:/Users/genaucka/Google Drive/Library/01_Projects/PIT_GD/R/analyses/01_classification/results/1010')
+# setwd('C:/Users/genaucka/Google Drive/Library/01_Projects/PIT_GD/R/analyses/01_classification/results/1008')
+# win_mods = cur_mod_sel_nooCV
 # win_mods = agk.recode(win_mods,c('acc'),c('ac'))
 # for (mm in 1:length(win_mods)) {
 #   pp_b_dat = featmod_coefs[[win_mods[mm]]]
@@ -89,7 +94,6 @@ agk.assign.envtoenv(e,globalenv())
 
 # predict with each model
 responses = list()
-cur_mod_sel_nooCV = agk.recode(cur_mod_sel_nooCV,c('acc'),c('ac'))
 for (mm in 1:length(list_winning_model_c_nooCV)) {
   cur_c = list_winning_model_c_nooCV[[mm]]
   cur_l = list_winning_model_l_nooCV[[mm]]
@@ -152,21 +156,28 @@ for (aa in 1:length(responses)) {
 cur_dat_be = data.frame(random_classifier = all_aucs,mean_auc = rep(all_mod_mean_auc,length(all_aucs)),classifier = 'prev_behav_glmnet')
 
 
-cur_dat              = rbind(cur_dat_be) #,cur_dat_gl,cur_dat_sv)
-cur_dat              = melt(cur_dat,id.vars = c('classifier'))
-cur_dat_H_0          = subset(cur_dat,variable == 'random_classifier')
-cur_dat_H_0$mean_auc = cur_dat$value[cur_dat$variable == 'mean_auc']
-cur_dat              = cur_dat_H_0
-cur_dat$AUC_ROC      = cur_dat$value
-cur_dat$value        = NULL
-p = ggplot(cur_dat,aes(x=AUC_ROC, fill=variable)) + geom_density(alpha=0.25)
+cur_dat                = rbind(cur_dat_be) #,cur_dat_gl,cur_dat_sv)
+cur_dat                = melt(cur_dat,id.vars = c('classifier'))
+cur_dat_H_0            = subset(cur_dat,variable == 'random_classifier')
+cur_dat_H_0$mean_auc   = cur_dat$value[cur_dat$variable == 'mean_auc']
+cur_dat                = cur_dat_H_0
+cur_dat$AUC_ROC        = cur_dat$value
+cur_dat$value          = NULL
+cur_dat$algorithm      = cur_dat$classifier
+cur_dat$classifier     = cur_dat$variable
+cur_dat$classifier = agk.recode.c(cur_dat$classifier,'random_classifier','random')
+
+p = ggplot(cur_dat,aes(x=AUC_ROC, fill=classifier)) + geom_density(alpha=0.25)
 #p = p + facet_grid(classifier ~ .) + ggtitle('AUC densities for estimated classifier compared to random classifier')
-p = p + ggtitle('AUC densities for estimated classifier compared to random classifier')
+p = p + ggtitle('AUC densities for ensemble classifier compared to random classifier')
 p = p + geom_vline(aes(xintercept = mean_auc),colour = 'green',size= 1.5)
 p = p + coord_cartesian(xlim = c(0.42, 0.8)) 
 p = p + theme_bw()
 p = p + theme(axis.text=element_text(size=14, face = "bold"),
               axis.title=element_text(size=20,face="bold"))
+p = p + theme(plot.title = element_text(size=22))
+p = p + theme(legend.text = element_text(size=18))
+p = p + theme(legend.title= element_text(size=18))
 print(p)
 
 ## two density plots ==============================================================
@@ -195,4 +206,23 @@ p = p + theme_bw()
 p = p + theme(axis.text=element_text(size=14, face = "bold"),
               axis.title=element_text(size=20,face="bold"))
 p = p + coord_cartesian(xlim = c(0.4, 0.8)) 
+p = p + theme(plot.title = element_text(size=22))
 print(p)
+
+
+## EXTRA NEW STUFF
+## do a paired test ===============================================================
+# shorten to see if we can get it with less samples
+Ha_auc_short = Ha_auc[1:17] 
+improvement = c()
+ct          = 0
+for (cur_auc in all_aucs){
+  ct = ct + 1
+  improvement[ct] = sample(Ha_auc_short,size = 1) - cur_auc
+}
+agk.density_p(improvement,0)
+
+## take mean of single predictions ================================================
+message('p-value for mean(AUC):')
+message(' ')
+message(1-agk.density_p.c(all_aucs,mean(Ha_auc)))

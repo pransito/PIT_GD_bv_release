@@ -93,7 +93,10 @@ for (ii in 1:length(des_vars)) {
   cur_res = list()
   cur_res$meanHC = mean(x1)
   cur_res$meanPG = mean(x2)
+  cur_res$modeHC = getmode(x1)
+  cur_res$modePG = getmode(x2)
   cur_res$p      = round(cfint$p.value,digits = 3)
+  cur_res$t      = round(cfint$statistic,digits = 3)
   
   cfint_list[[cur_map[ii]]] = cur_res
 }
@@ -105,7 +108,7 @@ for(ii in 2:length(cfint_list)) {
   cur_res$gamble = names(cfint_list)[ii]
   cfint = rbind(cfint,cur_res)
 }
-cfint = cfint[c(4,1,2,3)]
+cfint = cfint[c(7,1,2,3,4,5,6)]
 
 message('Kind of gambles HC and GD play, with p-values')
 print(cfint)
