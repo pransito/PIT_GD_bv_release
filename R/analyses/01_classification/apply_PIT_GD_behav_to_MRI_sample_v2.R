@@ -169,15 +169,16 @@ cur_dat$classifier = agk.recode.c(cur_dat$classifier,'random_classifier','random
 
 p = ggplot(cur_dat,aes(x=AUC_ROC, fill=classifier)) + geom_density(alpha=0.25)
 #p = p + facet_grid(classifier ~ .) + ggtitle('AUC densities for estimated classifier compared to random classifier')
-p = p + ggtitle('AUC densities for ensemble classifier compared to random classifier')
+p = p + ggtitle('AUC of trained classifier compared to random classifier')
 p = p + geom_vline(aes(xintercept = mean_auc),colour = 'green',size= 1.5)
 p = p + coord_cartesian(xlim = c(0.42, 0.8)) 
 p = p + theme_bw()
-p = p + theme(axis.text=element_text(size=14, face = "bold"),
+p = p + theme(axis.text=element_text(size=20, face = "bold"),
               axis.title=element_text(size=20,face="bold"))
 p = p + theme(plot.title = element_text(size=22))
 p = p + theme(legend.text = element_text(size=18))
 p = p + theme(legend.title= element_text(size=18))
+p = p + xlab('AUC ROC')
 print(p)
 
 ## two density plots ==============================================================
@@ -200,13 +201,14 @@ cur_dat              = melt(cur_dat,id.vars = c('classifier'))
 
 # plot
 p = ggplot(cur_dat,aes(x=value, fill=variable)) + geom_density(alpha=0.25)
-p = p + facet_grid(classifier ~ .) + ggtitle('AUC densities for glmnet classifier on MRI behav data compared to random classifier')
+p = p + facet_grid(classifier ~ .) + ggtitle('AUC densities for elastic net classifier and random classifier')
 p = p + geom_vline(aes(xintercept = as.numeric(all_mod_mean_auc)),colour = 'green',size= 1.5)
 p = p + theme_bw()
 p = p + theme(axis.text=element_text(size=14, face = "bold"),
               axis.title=element_text(size=20,face="bold"))
 p = p + coord_cartesian(xlim = c(0.4, 0.8)) 
 p = p + theme(plot.title = element_text(size=22))
+p = p + xlab('AUC ROC')
 print(p)
 
 

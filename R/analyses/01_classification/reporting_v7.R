@@ -276,7 +276,7 @@ if (report_CV_p) {
   
   abline(a=1,b=-1,lty=4,lwd=2)
   title('Receiver-Operating-Curve for Behavioral Classifier',cex.main = 1.5)
-  legend(1.02, 1.02, c("ROC of classifier with 95% bounds", "ROC of control classifier with 95% bounds", "hypothetical null"),
+  legend(1.02, 1.02, c("ROC of classifier with 95% bounds", "ROC of baseline classifier with 95% bounds", "hypothetical null"),
          col = c('blue', 'red', 'black'),
          text.col = "black", lty = c(1, 2, 2),
          merge = TRUE, bg = "gray90")
@@ -287,19 +287,18 @@ if (report_CV_p) {
   # plots also the density of the performance of the classifier
   Ha_auc                 = auc
   Ha_auc                 = rep_len(Ha_auc,length.out = length(auc_p))
-  cur_dat_gl             = data.frame(null_classifier = auc_p,full_classifier = Ha_auc,classifier = 'elastic net')
+  cur_dat_gl             = data.frame(baseline_classifier = auc_p,full_classifier = Ha_auc,classifier = 'elastic net')
   cur_dat                = rbind(cur_dat_gl) #rbind(cur_dat_be,cur_dat_gl,cur_dat_sv)
   cur_dat                = melt(cur_dat,id.vars = c('classifier'))
   cur_dat$AUC_ROC        = cur_dat$value
   cur_dat$value          = NULL
   cur_dat$algorithm      = cur_dat$classifier
   cur_dat$classifier     = cur_dat$variable  
-  cur_dat$classifier     = agk.recode.c(cur_dat$classifier,c('full_classifier','null_classifier'),c('full','null'))
+  cur_dat$classifier     = agk.recode.c(cur_dat$classifier,c('full_classifier','baseline_classifier'),c('full','baseline'))
   
   # plot
   p = ggplot(cur_dat,aes(x=AUC_ROC, fill=classifier)) + geom_density(alpha=0.25)
-  p = p + ggtitle('AUC densities for elastic net classifier compared to null-classifier')
-  #p = p + facet_grid(algorithm ~ .)
+  p = p + ggtitle('AUC densities for elastic net classifier and baseline classifier')
   p = p + geom_vline(aes(xintercept = mean(auc)),colour = 'green',size= 1.5)
   p = p + theme_bw()
   p = p + theme(axis.text=element_text(size=14, face = "bold"),
@@ -307,6 +306,7 @@ if (report_CV_p) {
   p = p + theme(plot.title = element_text(size=22))
   p = p + theme(legend.text = element_text(size=18))
   p = p + theme(legend.title= element_text(size=18))
+  p = p + xlab('AUC ROC')
   print(p)
 }
 
@@ -421,6 +421,7 @@ labels_betas   = agk.recode(levels(ci_res$coef),labels_sources,
 ci_res$coef    = factor(ci_res$coef, levels = levels(ci_res$coef), labels = labels_betas)
 
 p = ggplot(data = ci_res, aes(coef,mean))
+p = p + theme_bw()
 p = p+geom_bar(stat="identity")
 p = p + geom_errorbar(aes(ymin=lower,ymax=upper), size=1.3, color=cbbPalette[4],
                       width = 0) + ylab("mean (95% CI)\n")
@@ -429,6 +430,8 @@ p <- p + ggtitle("Estimated regression weights of winning model")
 p = p + theme(text = element_text(size=25),
               axis.text.x = element_text(angle=45, hjust=1)) 
 p = p + xlab("regression weights")
+
+
 print(p)
 
 ## HAUFE TRANFORMATION OF CLASSIFIER ==========================================
