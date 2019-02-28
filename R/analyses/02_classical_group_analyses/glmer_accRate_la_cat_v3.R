@@ -39,7 +39,7 @@ cur_num   = 100
 cur_cpus  = detectCores()-1
 # fit glmer models?
 # careful this takes on an intel core i7 with 8GB RAM about 10 minutes
-doFitGlmer = 0
+doFitGlmer = 1
 # put in the original fixed effect estimation
 put_in_original_fe = 1
 
