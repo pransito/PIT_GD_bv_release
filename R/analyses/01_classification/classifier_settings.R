@@ -8,18 +8,18 @@
 
 ## WHAT TO RUN ================================================================
 # just the behavioral parameter sets
-outer_cv_noaddfeat      = T # with outer CV, getting generalization error, Ha
-noout_cv_noaddfeat      = T # no outer CV, get complete model on whole sample
+outer_cv_noaddfeat      = F # with outer CV, getting generalization error, Ha
+noout_cv_noaddfeat      = F # no outer CV, get complete model on whole sample
 
 # control model
-outer_cv_c_model        = T # baseline model for classif.: predict with covariate
+outer_cv_c_model        = F # baseline model for classif.: predict with covariate
 
 # what to report
-do_report_no_added_feat = F # set to 1 to see the report of the behavioral classifier
+do_report_no_added_feat = T # set to 1 to see the report of the behavioral classifier
 
 # number of runs to get the CV results distribution, >=1000 recommended
 # 1008: for reporting of results as in paper
-runs = 1
+runs = 1008
 
 # advanced settings (do not change) ===========================================
 report_CV_p = T
