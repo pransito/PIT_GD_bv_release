@@ -18,7 +18,7 @@ Careful: The script "R/analyses/01_classification/group_pred_loop_v7.R" (called 
 if you would like to continue.
 
 2)
-If you want to see results you set everything to FALSE in "WHAT TO RUN" section in "R/analyses/01_classification/classifier_settings.R", except "do_report_no_added_feat" to TRUE. Set runs to "1008" to see the results reported in the paper.
+If you want to see results you set everything to FALSE in "WHAT TO RUN" section in "R/analyses/01_classification/classifier_settings.R", except "do_report_no_added_feat" to TRUE. Set runs to "1008" to see the results reported in the paper, then run the script: R/analyses/01_classification/reporting_v7.R
 
 3)
 The machine learning part is started with the script "R/analyses/01_classification/group_pred_loop_v7.R" Before running it, you may adjust the settings in: "R/analyses/01_classification/classifier_settings.R" [set "runs" to a low number like 10 for it is an intense script which takes a long time to run]. Set everything under "WHAT TO RUN" to TRUE except "do_report_no_added_feat" to FALSE, unless you want to get a report on your runs (should be at least 50-100). 
