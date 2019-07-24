@@ -86,18 +86,25 @@ if (which_study == 'POSTPILOT_HCPG') {
   mod_acc$Group  = agk.recode.c(mod_acc$Group,'PG','GD')
   
   mRat  = ggplot(mod_acc, aes(category, mean_acceptance,fill=Group))
-  mRat  = mRat + labs(x='category', y=paste('Mean of acceptance (',0.95*100,'% CI, bootstrapped)'))
+  mRat  = mRat + labs(x='category', y=paste('Mean of acceptance\n(',0.95*100,'% CI, bootstrapped)'))
   mRat  = mRat + ggtitle("Mean acceptance across categories")
   mRat  = mRat + geom_bar(position="dodge", stat="identity")
   dodge = position_dodge(width=0.9)
   mRat  = mRat + geom_bar(position=dodge, stat="identity")
-  mRat  = mRat + geom_errorbar(aes(ymin = ci_0025, ymax = ci_0975), position=dodge, width=0.25) + theme_bw()
-  print(mRat)
+  mRat  = mRat + geom_errorbar(aes(ymin = ci_0025, ymax = ci_0975), position=dodge, size=1.3, color=cbbPalette[4],
+                               width = 0) + theme_bw()
+  p = mRat
+  p = p + theme_bw()
+  p = p + theme(axis.text=element_text(size=30, face = "bold"),
+                axis.title=element_text(size=30,face="bold"))
+  p = p + theme(plot.title = element_text(size=25,face = 'bold'))
+  p = p + theme(legend.text = element_text(size=25))
+  p = p + theme(legend.title= element_text(size=25))
+  print(p)
 }
 
 ## sensitivity to gain, loss, LA ==============================================
 laecg_effects = summary(modla_0g)
-  
 HC_gain = laecg_effects$coefficients['gain',1]
 GD_gain = HC_gain + laecg_effects$coefficients['gain:HCPGPG',1]
 HC_loss = laecg_effects$coefficients['loss',1]

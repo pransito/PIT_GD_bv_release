@@ -298,14 +298,14 @@ if (report_CV_p) {
   
   # plot
   p = ggplot(cur_dat,aes(x=AUC_ROC, fill=classifier)) + geom_density(alpha=0.25)
-  p = p + ggtitle('AUC densities for elastic net classifier and baseline classifier')
+  p = p + ggtitle('AUC densities for elastic net classifier\nand baseline classifier')
   p = p + geom_vline(aes(xintercept = mean(auc)),colour = 'green',size= 1.5)
   p = p + theme_bw()
-  p = p + theme(axis.text=element_text(size=14, face = "bold"),
-                axis.title=element_text(size=20,face="bold"))
-  p = p + theme(plot.title = element_text(size=22))
-  p = p + theme(legend.text = element_text(size=18))
-  p = p + theme(legend.title= element_text(size=18))
+  p = p + theme(axis.text=element_text(size=25, face = "bold"),
+                axis.title=element_text(size=25,face="bold"))
+  p = p + theme(plot.title = element_text(size=25, face='bold'))
+  p = p + theme(legend.text = element_text(size=25))
+  p = p + theme(legend.title= element_text(size=25))
   p = p + xlab('AUC ROC')
   print(p)
 }
@@ -414,10 +414,10 @@ ci_res$coef                                = row.names(ci_res)
 ci_res$coef[ci_res$coef == 'Intercept']    = 'Int_behav_model'
 ci_res$coef[ci_res$coef == 'X.Intercept.'] = 'Int_classifier'
 
-labels_sources = c("catgambling","catnegative","catpositive","Int_behav_model","Int_classifier","edu_years") 
+labels_sources = c("catgambling","catnegative","catpositive","Int_behav_model","Int_classifier","smoking_ftdt") 
 ci_res$coef    = factor(ci_res$coef)
 labels_betas   = agk.recode(levels(ci_res$coef),labels_sources,
-                            c("gambling cues","negative cues","positive cues","intercept behavioral model","intercept of classifier","years of education"))
+                            c("gambling cues","negative cues","positive cues","int. behavioral model","intercept of classifier","smoking severity"))
 ci_res$coef    = factor(ci_res$coef, levels = levels(ci_res$coef), labels = labels_betas)
 
 p = ggplot(data = ci_res, aes(coef,mean))
@@ -426,9 +426,12 @@ p = p+geom_bar(stat="identity")
 p = p + geom_errorbar(aes(ymin=lower,ymax=upper), size=1.3, color=cbbPalette[4],
                       width = 0) + ylab("mean (95% CI)\n")
 
-p <- p + ggtitle("Estimated regression weights of winning model")
-p = p + theme(text = element_text(size=25),
-              axis.text.x = element_text(angle=45, hjust=1)) 
+p <- p + ggtitle("Estimated regression weights\nof winning model")
+p = p + theme(text = element_text(size=20, face = "bold"),
+              axis.text.x = element_text(angle=45, hjust=1))
+p = p + theme(plot.title = element_text(size=25,face = 'bold'))
+p = p + theme(legend.text = element_text(size=25))
+p = p + theme(legend.title= element_text(size=25))
 p = p + xlab("regression weights")
 
 

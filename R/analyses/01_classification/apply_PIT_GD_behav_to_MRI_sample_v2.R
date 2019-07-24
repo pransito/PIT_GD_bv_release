@@ -25,7 +25,7 @@ get.truth.1 = function() {
 }
 
 # set runs of random classification
-runs0 = 10000
+runs0 = 3000
 
 # under 0
 # pooled
@@ -75,21 +75,21 @@ for (ii in 1:runs0) {
 
 ## use a consensus of ALL models from PDT behav ===============================
 setwd(path_res_classif)
-setwd('results/1008/')
+setwd('results/1001/')
 load('POSTPILOT_HCPG_predGrp1_rounds_noo_noaddfeat.RData')
 
 # #get the standardization
 # #THIS CODE JUST FOR DOCUMENTATION; HAS BEEN DONE BEFORE AND RESULT SAVED
 # # first load postpilot data [prep for publication a new workspace]
-# setwd('C:/Users/genaucka/Google Drive/Library/01_Projects/PIT_GD/R/analyses/01_classification/results/1008')
+# setwd('C:/Users/genaucka/GitHub/PIT_GD_bv_release/R/analyses/01_classification/results/1001')
 # win_mods = cur_mod_sel_nooCV
 # win_mods = agk.recode(win_mods,c('acc'),c('ac'))
 # for (mm in 1:length(win_mods)) {
-#   pp_b_dat = featmod_coefs[[win_mods[mm]]]
-#   pp_b_dat = pp_b_dat[,grep('HCPG',names(pp_b_dat),invert=TRUE)]
-#   pp_b_dat = data.frame(pp_b_dat,pred_smoking_ftdt=dat_match$smoking_ftdt)
-#   pp_b_dat = scale(pp_b_dat)
-#   save(pp_b_dat, file=paste0('POSTPILOT_',win_mods[mm],'_stand.RData'))
+#  pp_b_dat = featmod_coefs[[win_mods[mm]]]
+#  pp_b_dat = pp_b_dat[,grep('HCPG',names(pp_b_dat),invert=TRUE)]
+#  pp_b_dat = data.frame(pp_b_dat,pred_smoking_ftdt=dat_match$smoking_ftdt)
+#  pp_b_dat = scale(pp_b_dat)
+#  save(pp_b_dat, file=paste0('POSTPILOT_',win_mods[mm],'_stand.RData'))
 # }
 
 # predict with each model
@@ -173,11 +173,11 @@ p = p + ggtitle('AUC of trained classifier compared to random classifier')
 p = p + geom_vline(aes(xintercept = mean_auc),colour = 'green',size= 1.5)
 p = p + coord_cartesian(xlim = c(0.42, 0.8)) 
 p = p + theme_bw()
-p = p + theme(axis.text=element_text(size=20, face = "bold"),
-              axis.title=element_text(size=20,face="bold"))
-p = p + theme(plot.title = element_text(size=22))
-p = p + theme(legend.text = element_text(size=18))
-p = p + theme(legend.title= element_text(size=18))
+p = p + theme(axis.text=element_text(size=30, face = "bold"),
+              axis.title=element_text(size=30,face="bold"))
+p = p + theme(plot.title = element_text(size=25,face = 'bold'))
+p = p + theme(legend.text = element_text(size=25))
+p = p + theme(legend.title= element_text(size=25))
 p = p + xlab('AUC ROC')
 print(p)
 
@@ -215,7 +215,7 @@ print(p)
 ## EXTRA NEW STUFF
 ## do a paired test ===============================================================
 # shorten to see if we can get it with less samples
-Ha_auc_short = Ha_auc[1:17] 
+Ha_auc_short = Ha_auc[1:1000] 
 improvement = c()
 ct          = 0
 for (cur_auc in all_aucs){

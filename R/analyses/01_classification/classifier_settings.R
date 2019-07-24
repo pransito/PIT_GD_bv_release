@@ -15,10 +15,11 @@ noout_cv_noaddfeat      = F # no outer CV, get complete model on whole sample
 outer_cv_c_model        = F # baseline model for classif.: predict with covariate
 
 # what to report
-do_report_no_added_feat = T # set to 1 to see the report of the behavioral classifier
+do_report_no_added_feat = T # set to T to see the report of the behavioral classifier
 
 # number of runs to get the CV results distribution, >=1000 recommended
 # 1008: for reporting of results as in paper
+# 1001: cut to 45 and novelty adjusted
 runs = 1008
 
 # advanced settings (do not change) ===========================================

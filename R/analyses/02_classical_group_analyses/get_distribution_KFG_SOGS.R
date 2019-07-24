@@ -1,5 +1,15 @@
 ## get the distribution of KFG and SOGS
 KFG_SOGS = dat_match[c('HCPG','KFG','SOGS')]
+
+## get the classifications
+KFG_SOGS$HCPG_KFG = ifelse(KFG_SOGS$KFG > 15,TRUE,FALSE)
+KFG_SOGS$HCPG_SOGS = ifelse(KFG_SOGS$SOGS > 4,TRUE,FALSE)
+
+# get the agreement
+print('The agreement in HC-GD classification between KFG and SOGS is')
+print(mean(KFG_SOGS$HCPG_KFG == KFG_SOGS$HCPG_SOGS))
+
+# get jitter
 KFG_SOGS[c('KFG','SOGS')] = KFG_SOGS[c('KFG','SOGS')] + randn(dim(KFG_SOGS)[1],dim(KFG_SOGS)[2]-1)*0.1
 KFG_SOGS$Group= as.factor(agk.recode(as.character(KFG_SOGS$HCPG),c('HC','PG'),c('HC','GD')))
 
