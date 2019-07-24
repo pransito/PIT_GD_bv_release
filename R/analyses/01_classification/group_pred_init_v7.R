@@ -23,6 +23,53 @@ agk.group.pred.init = function() {
   data_pdt = data_pdt_bcp_study_selected
   dat_match = dat_match_bcp_study_selected
   
+  # add novelty factor
+  add_novelty_factor = function(data_pdt) {
+    
+    data_pdt$novel = 1
+    
+    all_subs = unique(data_pdt$subject)
+    
+    for (cur_sub in all_subs) {
+      novelity_info = as.numeric(base::duplicated(data_pdt$stim[data_pdt$subject == cur_sub]) == TRUE)
+      data_pdt$novel[data_pdt$subject == cur_sub] = novelity_info
+    }
+    
+    data_pdt$novel = as.factor(data_pdt$novel)
+    return(data_pdt)
+  }
+  
+  data_pdt = add_novelty_factor(data_pdt)
+  
+  # cut gambling cues
+  cut_gam_cues = function(data_pdt) {
+    
+    all_subs = unique(data_pdt$subject)
+    res = list()
+    for (ii in 1:length(all_subs)) {
+      cur_sub = all_subs[ii]
+      cur_dat = subset(data_pdt,subject == cur_sub)
+      cur_dat_gam = subset(cur_dat, cat == 'gambling' )
+      cur_dat_oth = subset(cur_dat, cat != 'gambling' )
+      cur_dat_gam = cur_dat_gam[sample(seq(1,length(cur_dat_gam[,1])),45),]
+      cur_dat = rbind(cur_dat_gam,cur_dat_oth)
+      res[[ii]] = cur_dat
+    }
+    
+    res_all = res[[1]]
+    for (ii in 2:length(res)) {
+      res_all = rbind(res_all,res[[ii]])
+    }
+    
+    return(res_all)
+  }
+  
+  
+  if (cut_gambling_cues) {
+    message('Cutting gambling cues to 45.')
+    data_pdt = cut_gam_cues(data_pdt)
+  }
+  
   # plot ratings
   setwd(root_wd)
   source("01_classification/plot_ratings_betting_behav.R")
@@ -104,8 +151,11 @@ agk.group.pred.init = function() {
   if (est_models == 1) {
     
     if (!mod_physio_val) {
+      
       # legacy; but needs to stay for now
       clmList = lmList
+      
+      if (!add_novelty) {
       
       # lmlist
       a         = clmList(accept_reject ~ 1 | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
@@ -128,6 +178,33 @@ agk.group.pred.init = function() {
                             loss.catgambling + loss.catnegative + loss.catpositive | subject,
                           data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
       
+      } else {
+        message('All single-subject models controlled for novelty')
+        # adding the novelty factor
+        # lmlist
+        a         = clmList(accept_reject ~ novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        ac        = clmList(accept_reject ~ cat + novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        laec      = clmList(accept_reject ~ gain+loss+ed_abs+cat+novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        lac       = clmList(accept_reject ~ gain+loss+cat+novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        laeci     = clmList(accept_reject ~ (gain+loss+ed_abs)*cat+novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        laci      = clmList(accept_reject ~ (gain+loss)*cat+novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        lae       = clmList(accept_reject ~ gain+loss+ed_abs+novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        la        = clmList(accept_reject ~ gain+loss+novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        # ratio lmlist (no mu, please! drop it! it's enough!)
+        lar       = clmList(accept_reject ~ ratio+novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        larc      = clmList(accept_reject ~ ratio + cat +novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        larci     = clmList(accept_reject ~ ratio*cat+novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        
+        # charpentier lmlist (same as la but without intercept, then mu and lambda can be analytically computed)
+        laCh      = clmList(accept_reject ~ 0 + gain + loss+novel | subject,data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        # Charpentier per category
+        laChci    = clmList(accept_reject ~ 0 + gain + loss + gain.catgambling + gain.catnegative + gain.catpositive +       
+                              loss.catgambling + loss.catnegative + loss.catpositive+novel | subject,
+                            data = data_pdt,family = needed_family,na.action = NULL,pool = do_pool)
+        
+        
+      }
+      
       # packing (in order of complexity)
       fm = list()
       fm$a       = a
@@ -145,6 +222,7 @@ agk.group.pred.init = function() {
       fm$laChci  = laChci
       
     } else {
+      warning('NO ADDING OF NOVELTY OF STIMULUS IMPLEMENTED.')
       # with mod_physio_val
       # so valence and arousal can modulate choice behavior
       
@@ -246,6 +324,17 @@ agk.group.pred.init = function() {
   if (initial_scale) {
     disp('Scaling the model parameters in fm.')
     fm = lapply(fm,FUN=agk.scale.ifpossible)
+  }
+  
+  # take out the cov of no-interest: novelty of stimulus
+  if (add_novelty) {
+    cur_fun = function(x) {
+      x$novel1 = NULL
+      x$novel0 = NULL
+      return(x)
+    }
+    
+    fm = lapply(fm,FUN =cur_fun)
   }
   
   # Within subject z-scoring of feature vectors
