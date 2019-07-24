@@ -36,10 +36,10 @@ which_study = "POSTPILOT_HCPG"
 
 # add novelity of cue as factor
 # will control all single subject models for novelty of cue (duplicate or not) 
-add_novelty = T
+add_novelty = F
 
 # cut gambling cues from 67 to 45?
-cut_gambling_cues = T
+cut_gambling_cues = F
 
 ## PREPARATIONS ===============================================================
 if (physio_sum_fun == 'mean') {
