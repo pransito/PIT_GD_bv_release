@@ -30,8 +30,16 @@ data_pdt_inv = data_pdt
 
 ## PARAMETER SETTINGS =========================================================
 # which study to look at (Cohorts)? ===========================================
-#which_study = "POSTPILOT_HCPG"
-which_study = "MRI"
+which_study = "POSTPILOT_HCPG"
+#which_study = "MRI"
+
+
+# add novelity of cue as factor
+# will control all single subject models for novelty of cue (duplicate or not) 
+add_novelty = T
+
+# cut gambling cues from 67 to 45?
+cut_gambling_cues = T
 
 ## PREPARATIONS ===============================================================
 if (physio_sum_fun == 'mean') {
