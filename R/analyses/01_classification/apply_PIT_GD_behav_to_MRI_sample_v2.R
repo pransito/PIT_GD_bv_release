@@ -212,6 +212,44 @@ p = p + xlab('AUC ROC')
 print(p)
 
 
+
+# plots also the margin value
+mean_response = weighted_responses/1001
+mean_response_p = rand(length(mean_response),1)-0.5
+real_group = dat_match$HCPG
+
+HCmarg = boot::inv.logit(simpleboot::one.boot(mean_response[real_group == 'HC'], median,50000)$t)
+GDmarg = boot::inv.logit(simpleboot::one.boot(mean_response[real_group == 'PG'], median,50000)$t)
+HCmarg_p = boot::inv.logit(simpleboot::one.boot(mean_response_p[real_group == 'HC'], median,50000)$t)
+GDmarg_p = boot::inv.logit(simpleboot::one.boot(mean_response_p[real_group == 'PG'], median,50000)$t)
+
+
+cur_dat_marg_cl        = data.frame(HCmarg = HCmarg,GDmarg = GDmarg,classifier = 'elastic net')
+cur_dat_marg_bl        = data.frame(HCmarg = HCmarg_p,GDmarg = GDmarg_p,classifier = 'random')
+cur_dat                = rbind(cur_dat_marg_cl,cur_dat_marg_bl) #rbind(cur_dat_be,cur_dat_gl,cur_dat_sv)
+cur_dat                = melt(cur_dat,id.vars = c('classifier'))
+cur_dat$group = cur_dat$variable 
+cur_dat$variable = NULL
+
+# density plot
+p = ggplot(cur_dat,aes(x=value, fill=group)) + geom_density(aes(x=value, y=..scaled.., fill=group),kernel = 'gaussian', n = 512,alpha=0.25)
+p = p + ggtitle('Probability distributions of median GD and HC margins on valid. sample test data\nfor elastic net classifier and baseline classifier over 1000 rounds of classifier estimation')
+p = p + scale_x_continuous(lim = c(0, 1))
+p = p + geom_vline(aes(xintercept = 0.5),colour = 'blue',size= 1.0)
+p = p + theme_bw()
+p = p + facet_wrap(~ classifier, scales = "free_x",nrow=3,ncol=2)
+p = p + theme(strip.text.x = element_text(size = 15, face='bold'))
+p = p + theme(axis.text=element_text(size=20, face = "bold"),
+              axis.title=element_text(size=20,face="bold"))
+p = p + theme(plot.title = element_text(size=25, face='bold'))
+p = p + theme(legend.text = element_text(size=25))
+p = p + theme(legend.title= element_text(size=25))
+p = p + xlab('median margin of classifier [probability(Group = GD)]')
+p = p + ylab('probability of median margin value')
+print(p)
+
+
+
 ## EXTRA NEW STUFF
 ## do a paired test ===============================================================
 # shorten to see if we can get it with less samples
