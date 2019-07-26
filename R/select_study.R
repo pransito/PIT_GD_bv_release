@@ -30,8 +30,8 @@ data_pdt_inv = data_pdt
 
 ## PARAMETER SETTINGS =========================================================
 # which study to look at (Cohorts)? ===========================================
-which_study = "POSTPILOT_HCPG"
-#which_study = "MRI"
+#which_study = "POSTPILOT_HCPG"
+which_study = "MRI"
 
 
 # add novelity of cue as factor
