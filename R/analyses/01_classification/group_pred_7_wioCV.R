@@ -840,6 +840,7 @@ res_list$xtab_m = cur_xtab_m
 res_list$roc    = cur_roc
 #res_list$roc    = rocs
 res_list$auc    = cur_roc$auc
+res_list$flds   = flds # also saving the folds to get subject-specific predictions later;
 
 CV_res          = res_list
 
