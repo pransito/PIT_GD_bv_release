@@ -52,6 +52,15 @@ if (exists('CV_res_list_op')) {
   CV_res_list = CV_res_list_op
 }
 
+# FUNCTIONS ===================================================================
+agk.median.quantile = function(x,lower,upper) {
+  # function to return the x% (given by lower and upper) quantile and the mean
+  x_out <- quantile(x,probs = c(lower,upper))
+  x_out <- c(median(x),x_out)
+  names(x_out) <- c("median", "lower", "upper")
+  return(x_out)
+}
+
 # REPORTING: p-values =========================================================
 if (report_CV_p) {
   # p-value for the algorithm
@@ -80,6 +89,16 @@ if (report_CV_p) {
   prec_p   = c()   # precision under 0
   bacc     = c()   # balanced accuracy
   bacc_p   = c()   # b.a. under 0
+  marg_GD  = list()   # median marginal prob value for GD
+  marg_HC  = list()   # median marginal prob value for HC
+  marg_GD_p= list()   # median marginal prob value for GD
+  marg_HC_p= list()   # median marginal prob value for HC
+  
+  marg_GDl  = list()   # marginal prob value for GD
+  marg_HCl  = list()   # marginal prob value for HC
+  marg_GD_pl= list()   # marginal prob value for GD
+  marg_HC_pl= list()   # marginal prob value for HC
+  
   if (length(CVp_res_list) >= 1000) {
     bootstr_length = 1000
   } else {
@@ -154,6 +173,21 @@ if (report_CV_p) {
     } else {
       roc_pl[[ii]] = smooth(roc_pl[[ii]],n = 500)
     }
+    
+    # get the marginal value (mean probability per group)
+    cur_pred_HC = CV_res_list[[ii]]$roc$predictor[CV_res_list[[ii]]$roc$response == 'HC']
+    cur_pred_GD = CV_res_list[[ii]]$roc$predictor[CV_res_list[[ii]]$roc$response == 'PG']
+    marg_GD[[ii]] = median(cur_pred_GD)
+    marg_HC[[ii]] = median(cur_pred_HC)
+    cur_pred_HC = CVp_res_list[[ii]]$roc$predictor[CV_res_list[[ii]]$roc$response == 'HC']
+    cur_pred_GD = CVp_res_list[[ii]]$roc$predictor[CV_res_list[[ii]]$roc$response == 'PG']
+    marg_GD_p[[ii]] = median(cur_pred_GD,0.25,0.75)
+    marg_HC_p[[ii]] = median(cur_pred_HC,0.25,0.75)
+    
+    # get the pure marginal value
+    #marg_GD_pl[[ii]] = CV_res_list[[ii]]$roc$predictor
+    #marg_HC_pl[[ii]] = CV_res_list[[ii]]$roc$response
+    
   }
   
   # print the mean of acc, sens, spec
@@ -555,3 +589,53 @@ if (which_study == 'MRI') {
   message('The strongest betas are:')
   print(all_As_ordered[1:4,])
 }
+
+# reporting the marginal values
+# transforming
+#marg_GD = boot::inv.logit(marg_GD)
+#marg_HC = boot::inv.logit(marg_HC)
+
+#marg_GD_p = boot::inv.logit(marg_GD_p)
+#marg_HC_p = boot::inv.logit(marg_HC_p)
+
+# message
+message('Median marginal values for GD, HC and then GD, HC under H0:')
+print(boot::inv.logit(median(unlist(marg_GD))))
+print(boot::inv.logit(median(unlist(marg_HC))))
+
+print(boot::inv.logit(median(unlist(marg_GD_p))))
+print(boot::inv.logit(median(unlist(marg_HC_p))))
+
+
+# density plots marginal plots
+# margin collections to be done into one
+marg_HC = boot::inv.logit(as.numeric(unlist(marg_HC)))
+marg_GD = boot::inv.logit(as.numeric(unlist(marg_GD)))
+marg_HC_p = boot::inv.logit(as.numeric(unlist(marg_HC_p)))
+marg_GD_p = boot::inv.logit(as.numeric(unlist(marg_GD_p)))
+
+# plots also the density of the performance of the classifier
+cur_dat_marg_cl        = data.frame(HCmarg = marg_HC,GDmarg = marg_GD,classifier = 'elastic net')
+cur_dat_marg_bl        = data.frame(HCmarg = marg_HC_p,GDmarg = marg_GD_p,classifier = 'baseline')
+cur_dat                = rbind(cur_dat_marg_cl,cur_dat_marg_bl) #rbind(cur_dat_be,cur_dat_gl,cur_dat_sv)
+cur_dat                = melt(cur_dat,id.vars = c('classifier'))
+cur_dat$group = cur_dat$variable 
+cur_dat$variable = NULL
+
+# plot
+p = ggplot(cur_dat,aes(x=value, fill=group)) + geom_density(aes(x=value, y=..scaled.., fill=group),alpha=0.25)
+p = p + ggtitle('Probability distributions of median GD and HC margins on test data\nfor elastic net classifier and baseline classifier over 1000 rounds of classifier estimation')
+p = p + scale_x_continuous(lim = c(0, 1))
+p = p + geom_vline(aes(xintercept = 0.5),colour = 'blue',size= 1.0)
+p = p + theme_bw()
+p = p + facet_wrap(~ classifier, scales = "free_x",nrow=3,ncol=2)
+p = p + theme(strip.text.x = element_text(size = 15, face='bold'))
+p = p + theme(axis.text=element_text(size=20, face = "bold"),
+              axis.title=element_text(size=20,face="bold"))
+p = p + theme(plot.title = element_text(size=25, face='bold'))
+p = p + theme(legend.text = element_text(size=25))
+p = p + theme(legend.title= element_text(size=25))
+p = p + xlab('median margin of classifier [probability(Group = GD)]')
+p = p + ylab('probability of median margin value')
+print(p)
+
