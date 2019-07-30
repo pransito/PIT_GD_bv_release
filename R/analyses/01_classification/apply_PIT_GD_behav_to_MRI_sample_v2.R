@@ -25,7 +25,7 @@ get.truth.1 = function() {
 }
 
 # set runs of random classification
-runs0 = 3000
+runs0 = 4000
 
 # under 0
 # pooled
@@ -75,13 +75,13 @@ for (ii in 1:runs0) {
 
 ## use a consensus of ALL models from PDT behav ===============================
 setwd(path_res_classif)
-setwd('results/1001/')
+setwd('results/1008/')
 load('POSTPILOT_HCPG_predGrp1_rounds_noo_noaddfeat.RData')
 
 # #get the standardization
 # #THIS CODE JUST FOR DOCUMENTATION; HAS BEEN DONE BEFORE AND RESULT SAVED
 # # first load postpilot data [prep for publication a new workspace]
-# setwd('C:/Users/genaucka/GitHub/PIT_GD_bv_release/R/analyses/01_classification/results/1001')
+# setwd('C:/Users/genaucka/GitHub/PIT_GD_bv_release/R/analyses/01_classification/results/1003')
 # win_mods = cur_mod_sel_nooCV
 # win_mods = agk.recode(win_mods,c('acc'),c('ac'))
 # for (mm in 1:length(win_mods)) {
@@ -248,7 +248,13 @@ p = p + xlab('median margin of classifier [probability(Group = GD)]')
 p = p + ylab('probability of median margin value')
 print(p)
 
+# print the median margin values
+message('Median marginal values for GD, HC and then GD, HC under H0:')
+print(median(GDmarg))
+print(median(HCmarg))
 
+print(median(GDmarg_p))
+print(median(HCmarg_p))
 
 ## EXTRA NEW STUFF
 ## do a paired test ===============================================================

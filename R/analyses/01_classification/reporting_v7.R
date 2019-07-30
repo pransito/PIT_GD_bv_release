@@ -181,8 +181,8 @@ if (report_CV_p) {
     marg_HC[[ii]] = median(cur_pred_HC)
     cur_pred_HC = CVp_res_list[[ii]]$roc$predictor[CV_res_list[[ii]]$roc$response == 'HC']
     cur_pred_GD = CVp_res_list[[ii]]$roc$predictor[CV_res_list[[ii]]$roc$response == 'PG']
-    marg_GD_p[[ii]] = median(cur_pred_GD,0.25,0.75)
-    marg_HC_p[[ii]] = median(cur_pred_HC,0.25,0.75)
+    marg_GD_p[[ii]] = median(cur_pred_GD)
+    marg_HC_p[[ii]] = median(cur_pred_HC)
     
     # get the pure marginal value
     #marg_GD_pl[[ii]] = CV_res_list[[ii]]$roc$predictor
@@ -461,7 +461,7 @@ p = p + geom_errorbar(aes(ymin=lower,ymax=upper), size=1.3, color=cbbPalette[4],
                       width = 0) + ylab("mean (95% CI)\n")
 
 p <- p + ggtitle("Estimated regression weights\nof winning model")
-p = p + theme(text = element_text(size=20, face = "bold"),
+p = p + theme(text = element_text(size=30, face = "bold"),
               axis.text.x = element_text(angle=45, hjust=1))
 p = p + theme(plot.title = element_text(size=25,face = 'bold'))
 p = p + theme(legend.text = element_text(size=25))
@@ -592,28 +592,22 @@ if (which_study == 'MRI') {
 
 # reporting the marginal values
 # transforming
-#marg_GD = boot::inv.logit(marg_GD)
-#marg_HC = boot::inv.logit(marg_HC)
+marg_GD = boot::inv.logit(unlist(marg_GD))
+marg_HC = boot::inv.logit(unlist(marg_HC))
 
-#marg_GD_p = boot::inv.logit(marg_GD_p)
-#marg_HC_p = boot::inv.logit(marg_HC_p)
+marg_GD_p = boot::inv.logit(unlist(marg_GD_p))
+marg_HC_p = boot::inv.logit(unlist(marg_HC_p))
 
 # message
 message('Median marginal values for GD, HC and then GD, HC under H0:')
-print(boot::inv.logit(median(unlist(marg_GD))))
-print(boot::inv.logit(median(unlist(marg_HC))))
+print(median(marg_GD))
+print(median(marg_HC))
 
-print(boot::inv.logit(median(unlist(marg_GD_p))))
-print(boot::inv.logit(median(unlist(marg_HC_p))))
+print(median(marg_GD_p))
+print(median(marg_HC_p))
 
 
 # density plots marginal plots
-# margin collections to be done into one
-marg_HC = boot::inv.logit(as.numeric(unlist(marg_HC)))
-marg_GD = boot::inv.logit(as.numeric(unlist(marg_GD)))
-marg_HC_p = boot::inv.logit(as.numeric(unlist(marg_HC_p)))
-marg_GD_p = boot::inv.logit(as.numeric(unlist(marg_GD_p)))
-
 # plots also the density of the performance of the classifier
 cur_dat_marg_cl        = data.frame(HCmarg = marg_HC,GDmarg = marg_GD,classifier = 'elastic net')
 cur_dat_marg_bl        = data.frame(HCmarg = marg_HC_p,GDmarg = marg_GD_p,classifier = 'baseline')

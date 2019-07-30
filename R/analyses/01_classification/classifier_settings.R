@@ -21,6 +21,8 @@ do_report_no_added_feat = T # set to T to see the report of the behavioral class
 # 1008: for reporting of results as in paper
 # 1001: cut to 45 and novelty adjusted
 # 300: novelty adjusted only
+# 703: novelty adjusted with different seed to make 1003 runs
+# 1003: 703 plus 300; novelty adjusted only
 runs = 1008
 
 # advanced settings (do not change) ===========================================

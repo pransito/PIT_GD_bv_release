@@ -15,7 +15,7 @@
 
 # author: Alexander Genauck
 # email:  alexander.genauck@charite.de
-# date:   14.01.2019
+# date:   26.07.2019
 
 # PREPARATION FOR FOREIGN RUN =================================================
 setwd(paste0(root_wd,'/01_classification'))
@@ -76,7 +76,7 @@ if (!init_run) {
 
 # PARAMETERS TO SET: General ==================================================
 # set some seed to ensure reproducability
-des_seed              = 7777 #6993
+des_seed              = 7788 #7777 #6993
 # run the models (for param extraction in exp)
 est_models            = 1
 # ridge regression binomial;
