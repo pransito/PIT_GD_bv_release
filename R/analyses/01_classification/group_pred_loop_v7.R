@@ -3,12 +3,12 @@
 # script to run group prediction with CV in a loop to see how stable results are
 # i.e. group prediction cross validated; in a loop because
 # we work with 10-fold or 5-fold cross-validation for tuning and this can be run
-# many different times in different ways; needs to be sampled, like a bootstrap
+# many different times in different ways; needs to be sampled, similar to a bootstrap
 # note: prediction here used interchangeably with "classification"
 
-# through running a control model getting a null-distribution
+# script is also running a baseline model to get a H0-distribution
 # also you can run the nooCV version to get the model that is most likely 
-# estimated by the given data; nooCV: no outer cross validation; complete
+# estimated by the given data; nooCV: no outer cross validation, i.e. complete
 # data is used
 
 # use classifier_setting.R to set what you want to run

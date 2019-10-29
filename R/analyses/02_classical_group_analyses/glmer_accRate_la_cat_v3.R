@@ -144,7 +144,7 @@ print(anova(moda_00,moda_01b))
 ## plot loss aversion between groups ==========================================
 # bootstrap the CIs
 setwd(bootResWd)
-agk.load.ifnot.install(dplyr)
+agk.load.ifnot.install('dplyr')
 if (doBoot == 1) {
   # bootstrap p-value modla_0g (permutation)
   effects_under_0_0g = agk.boot.p.mermod(mermod = modla_0g,mermod0 = modla_01,num_cpus = cur_cpus,num = cur_num,fun_extract = fixef,cur_control = cur_control,permvars = c('HCPG'),type='perm')
