@@ -1,4 +1,4 @@
-# R Code for the PIT Gambling Disorder paper https://zenodo.org/badge/doi/10.5281/zenodo.3522402.svg
+# R Code for the PIT Gambling Disorder paper [![DOI](https://zenodo.org/badge/157091067.svg)](https://zenodo.org/badge/latestdoi/157091067)
 
 Code for publication of primary research article: "Cue-induced effects on decision-making distinguish subjects with gambling disorder from healthy controls"
 
