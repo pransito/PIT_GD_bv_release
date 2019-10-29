@@ -1,12 +1,12 @@
-# R Code for the PIT Gambling Disorder paper (behavioral data)
+# R Code for the PIT Gambling Disorder paper
 
 Code for publication of primary research article: "Cue-induced effects on decision-making distinguish subjects with gambling disorder from healthy controls"
 
-see here: https://doi.org/10.1111/adb.12841; https://doi.org/10.1101/564781
+see publication here: https://doi.org/10.1111/adb.12841; https://doi.org/10.1101/564781
 
 code by: Alexander Genauck (2019)
 
-## Downlaod
+## Download
 
 Fork the whole repository or download the zip and put it into some working directory.
 The .RData file has all the data and functions you will need. Especially data_pdt (choice data) and dat_match (questionnaire, demographic data). You will need R (https://cran.r-project.org/bin/windows/base/) and Rstudio (https://www.rstudio.com/products/rstudio/#Desktop) for this. Both are freely available software.
